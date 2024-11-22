@@ -13,9 +13,9 @@ import Services from '../components/Services';
 import About from '../components/About';
 import Contact from '../components/Contact';
 
-const HomeScreen = ({ match }) => {
-  const keyword = match.params.keyword;
 
+const HomeScreen = ({ match }) => {
+  const keyword = match.params.keyword || '';
   const pageNumber = match.params.pageNumber || 1;
 
   const dispatch = useDispatch();
@@ -27,19 +27,24 @@ const HomeScreen = ({ match }) => {
     dispatch(listProducts(keyword, pageNumber));
   }, [dispatch, keyword, pageNumber]);
 
+  // Scroll to top whenever pageNumber changes
   useEffect(() => {
     window.scroll({
       top: 0,
       left: 0,
       behavior: 'auto',
-    })
-  }, [pageNumber])
+    });
+  }, [pageNumber]);
+
+  // Safeguard: Ensure products is an array to prevent map errors
+  const safeProducts = Array.isArray(products) ? products : [];
+
   return (
     <>
       <section className="products-slider section">
         <Meta />
         {!keyword ? (
-          <ProductCarousel />
+          <ProductCarousel /> // Show carousel if no keyword
         ) : (
           <Container>
             <Link to="/" className="btn btn-light">
@@ -59,18 +64,22 @@ const HomeScreen = ({ match }) => {
           ) : (
             <>
               <Row>
-                {products.map((product) => (
-                  <Col
-                    className="product_cards_container"
-                    key={product._id}
-                    xs={6}
-                    md={4}
-                    lg={4}
-                    xl={3}
-                  >
-                    <Product product={product} />
-                  </Col>
-                ))}
+                {safeProducts.length > 0 ? (
+                  safeProducts.map((product) => (
+                    <Col
+                      className="product_cards_container"
+                      key={product._id}
+                      xs={6}
+                      md={4}
+                      lg={4}
+                      xl={3}
+                    >
+                      <Product product={product} />
+                    </Col>
+                  ))
+                ) : (
+                  <Message variant="info">No products found</Message>
+                )}
               </Row>
               <Paginate
                 pages={pages}

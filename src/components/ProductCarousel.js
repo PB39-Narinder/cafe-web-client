@@ -18,6 +18,9 @@ const ProductCarousel = () => {
     dispatch(listTopProducts());
   }, [dispatch]);
 
+  // Ensure products is always an array, even if it's empty
+  const productArray = Array.isArray(products) ? products : [];
+
   // Rendering loading state or error message if applicable
   if (loading) {
     return <Loader />;
@@ -30,25 +33,29 @@ const ProductCarousel = () => {
   return (
     <Container className="mt-4">
       <Carousel pause="hover" className="home-slider-bg">
-        {products.map((product) => (
-          <Carousel.Item key={product._id}>
-            <Link to={`/product/${product._id}`} className="carousel-item-link">
-              <div className="carousel-image-container">
-                <Image 
-                  src={product.image} 
-                  alt={product.name} 
-                  fluid 
-                  className="carousel-image" 
-                />
-              </div>
-              <Carousel.Caption className="carousel-caption">
-                <h2 className="carousel-title">
-                  {product.name} (₹{product.price})
-                </h2>
-              </Carousel.Caption>
-            </Link>
-          </Carousel.Item>
-        ))}
+        {productArray.length > 0 ? (
+          productArray.map((product) => (
+            <Carousel.Item key={product._id}>
+              <Link to={`/product/${product._id}`} className="carousel-item-link">
+                <div className="carousel-image-container">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fluid
+                    className="carousel-image"
+                  />
+                </div>
+                <Carousel.Caption className="carousel-caption">
+                  <h2 className="carousel-title">
+                    {product.name} (₹{product.price})
+                  </h2>
+                </Carousel.Caption>
+              </Link>
+            </Carousel.Item>
+          ))
+        ) : (
+          <Message variant="info">No top-rated products available</Message>
+        )}
       </Carousel>
     </Container>
   );
